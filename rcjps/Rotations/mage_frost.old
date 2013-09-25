@@ -1,0 +1,87 @@
+--psycho + stolen code ;-)
+
+function mage_frost(self)
+--pcmd
+	if UnitCanAttack("player","target")~=1 or UnitIsDeadOrGhost("target")==1 then return end
+	
+	local atBuffed = jps.buff("alter time","player")
+	local apBuffed = jps.buff("Arcane Power", "player")
+	local stacks = jps.debuffStacks("Frostbolt","target")
+	local froststacks = jps.debuffStacks("Fingers of Frost","player")
+	local fbDuration = jps.debuffDuration("Frostbolt","target")
+	local ntDuration = jps.debuffDuration("Nether Tempest", "target")
+	local manaGemCharges = GetItemCount("mana gem",0,1)
+	local LandShark = GetItemCount("G91 Landshark",0,1) 
+	local Sharks = GetItemCooldown(77589)
+	local playerMana = UnitMana("player")/UnitManaMax("player")  
+	local y=0;for i=1,40 do local n,_,_,_,_,_,_,_,isStealable=UnitAura("target",i);if isStealable==1 then print(n.." on target, steal it!")y=1;end end if y>=1 then end
+
+
+
+	local spellTable =
+	{
+	
+			--buffs
+		{ "Frost Armor",     		not jps.buff("Frost Armor","player"), "player" 		    },
+		{ "Arcane Brilliance",      not jps.buff("Arcane Brilliance","player"), "player"    },
+		--{ {"macro", "/run PlaySoundFile('Sound\\Character\\Orc\\OrcVocalMale\\OrcMaleCheer01.ogg') "}, 		jps.LastCast == "Frost Bomb"},
+		
+	    -- interrupt?
+	    -- Lets just check one CD before we go thru everything
+	    { "Alter Time", 		 jps.UseCDs and froststacks >= 1 and jps.buff("Brain Freeze", "player") and not jps.buff("Alter Time", "player")},
+		{ "Counterspell",        jps.Interrupts and jps.shouldKick("target"), "target"  },
+		{ "Spellsteal",		     y==1 and jps.Interrupts								},
+		-- { "Ice Barrier",      (UnitHealth("player") / UnitHealthMax("player") < 0.10)  and not jps.buff("Ice Barrier","player"), "player" },
+		
+		-- Key Press Checks
+		{ "Rune of Power",      IsShiftKeyDown() ~= nil },
+		{ "Flamestrike",		IsLeftControlKeyDown() ~= nil },
+		
+		-- Multi Target Check
+		{ { "macro","/use G91 Landshark"},    LandShark >= 1 and Sharks == 0 and jps.MultiTarget and not jps.Moving },
+		{ "Frozen Orb", 					 jps.MultiTarget and froststacks < 2									},
+		{ "Icy Veins",			             jps.MultiTarget and jps.UseCDs 									    },
+		
+		-- CDs
+		
+		{ "Mirror Image",    	 jps.UseCDs },
+		{ jps.useTrinket(1),     jps.UseCDs	},
+		{ jps.useTrinket(2),     jps.UseCDs	},
+		
+		
+		-- 5.2 Moving 
+		{ "Ice Lance", 						 jps.buff("Fingers of Frost", "player")	and jps.Moving	},
+		{ "Ice Floes",					     jps.Moving											 	},
+		{ "Frostfire Bolt", 				 jps.Moving and jps.buff("Brain Freeze", "player")	 	},
+		{ "Fire Blast", 					 jps.Moving 										 	},
+		{ "Ice Lance", 						 jps.Moving											 	},
+
+		
+		-- 5.2 DPS Single Target Rotation
+		
+		{ "Frostfire Bolt", 				 jps.buff("Brain Freeze", "player")					 				},
+		{ "Ice Lance", 						 jps.buff("Fingers of Frost", "player")				                },
+		{ "Frost Bomb",						 not jps.debuff("Frost Bomb") and jps.buff ("Presence of Mind")	    },
+		{ "Presence of Mind",	 													  			 				},
+		{ "Frostbolt",						 jps.buff("Presence of Mind")						 				},
+		{ "Rocket Barrage",																		 				},
+		{ "Frost Bomb",						 not jps.debuff("Frost Bomb") 						 				},
+		{ "Nether Tempest", 				 not jps.debuff("Nether Tempest") or ntDuration <= 2 				},
+		{ "Frostbolt", 						 stacks < 3 or fbDuration <= 2						 				},
+	    
+
+	    -- Filler Spells
+		{ "Frostbolt",  					  },
+		
+
+	}
+
+ local spell,target = parseSpellTable(spellTable)
+   if spell == "Flamestrike" or spell == "Rune of Power" then
+       jps.Cast( spell )
+       jps.groundClick()
+   end
+
+   jps.Target = target
+   return spell
+end

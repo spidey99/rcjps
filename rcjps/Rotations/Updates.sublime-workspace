@@ -1,0 +1,614 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"Mul",
+				"MultiTarget"
+			],
+			[
+				"n",
+				"nRage"
+			],
+			[
+				"energy",
+				"energyPerSec"
+			],
+			[
+				"targ",
+				"targetHealthPercent"
+			],
+			[
+				"buff",
+				"buffDuration"
+			],
+			[
+				"l",
+				"lEclipse"
+			],
+			[
+				"Moon",
+				"Moonfire"
+			],
+			[
+				"nat",
+				"natG"
+			],
+			[
+				"A",
+				"alignment"
+			],
+			[
+				"Ha",
+				"Haze"
+			],
+			[
+				"Di",
+				"Dizzying"
+			],
+			[
+				"spell",
+				"spellTable"
+			],
+			[
+				"player",
+				"playerHealth"
+			],
+			[
+				"pla",
+				"playerHealth"
+			],
+			[
+				"play",
+				"playerHealth"
+			],
+			[
+				"default",
+				"defaultTarget"
+			],
+			[
+				"Righ",
+				"Righteousness"
+			],
+			[
+				"Buff",
+				"buff"
+			],
+			[
+				"mind",
+				"Mind"
+			],
+			[
+				"Mu",
+				"MultiTarget"
+			],
+			[
+				"target",
+				"targetHealth"
+			],
+			[
+				"Bl",
+				"Bloodbath"
+			],
+			[
+				"lac",
+				"lacCount"
+			],
+			[
+				"br",
+				"BR"
+			],
+			[
+				"h1",
+				"H1"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "monk_brewmaster.lua",
+			"settings":
+			{
+				"buffer_size": 4958,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "warrior_fury.lua",
+			"settings":
+			{
+				"buffer_size": 4793,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "warrior_prot.lua",
+			"settings":
+			{
+				"buffer_size": 5712,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "warrior_arms.lua",
+			"settings":
+			{
+				"buffer_size": 3824,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "druid_balance.lua",
+			"settings":
+			{
+				"buffer_size": 3605,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 47.0,
+		"selected_items":
+		[
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 486.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Applications/World of Warcraft/Interface/AddOns/JPS/jps.toc",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/updates.toc",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/jps.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/priest_shadow.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/monk_windwalker.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/warrior_prot.lua",
+		"/Volumes/New Black/Install ISO/Eos Group - Timberline/Eos Explorer Extended/SQL 2000 Restore Scripts/EXPNGRenameFolders 2.6.0.sql",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/mage_arcane.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/mage_fire.lua",
+		"/Users/X/Documents/frostmoorne@yahoo.com  - Emaill password:",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/monk_mistweaver.lua",
+		"/Users/X/Downloads/mage_fire.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/warlock_affliction.lua",
+		"/Users/X/Documents/Eos Group/4.SHA/Utility DB scripts/1 Create Utility DB.sql",
+		"/Users/X/Downloads/mage_arcane-1.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/druid_balance.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/warrior_fury.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/lib/bindings.xml",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/jputils.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/lib/jpsgui.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/lib/jpconfig.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/hunter_sv.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/monk_brewmaster.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/shaman_resto.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/druid_resto.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/hunter_bm.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/jpdata.lua",
+		"/Users/X/Documents/Eos Group/4.DOS/server notes.txt",
+		"/Volumes/New Black/Install ISO/Eos Group - Timberline/setacl-cmdline-2.0.3.0-binary-x86/Command line.txt",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/paladin_ret.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Krups/krups.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/warrior_arms.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/hunter_mm.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Updates.toc",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/paladin_protadin.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/shaman_elemental.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/shaman_resto_pvp.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/shaman_resto_pve.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/priest_shadow_pve.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/warlock_demo.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/shaman_enhancement.lua",
+		"/Users/X/Desktop/JPS/Rotations/priest_shadow_pve.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/JPS/jps.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/dk_blood.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/priest_holy.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/priest_disc.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/JPS/Rotations/warrior_fury.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Updates/Rotations/druid_guardian.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/PriestHeal/Rotations/priest_disc.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/PriestHeal/Rotations/warrior_fury.lua",
+		"/Applications/World of Warcraft/Interface/AddOns/Ace/Rotations/warrior_arms.lua",
+		"/Users/X/Desktop/Patcher.txt",
+		"/Applications/PG/Routes/[Mist] Dread Wastes Mining + Herbing.routecollection",
+		"/Applications/World of Warcraft/Interface/AddOns/Ace/Rotations/warrior_prot.lua",
+		"/Users/X/Desktop/ABB LM.txt",
+		"/Applications/World of Warcraft/Interface/AddOns/Ace/Rotations/warrior_fury.lua",
+		"/Users/X/Library/Caches/Cleanup At Startup/Transmit/93C4F036-5322-44F1-84BD-A3B1BCA7D931/footer.php",
+		"/Applications/World of Warcraft/Interface/AddOns/Ace/Rotations/paladin_ret.lua",
+		"/Users/X/Documents/Git/insideGOOD/bonfire/modules/users/views/users/register.php",
+		"/Users/X/Documents/Git/insideGOOD/bonfire/application/config/user_meta.php",
+		"/Users/X/Documents/Git/insideGOOD/bonfire/themes/default/parts/modal_login.php",
+		"/Users/X/Documents/Git/insideGOOD/ins/views/header.php",
+		"/Users/X/Documents/Git/insideGOOD/bonfire/modules/campaigns/views/index.php",
+		"/Users/X/Documents/Git/insideGOOD/bonfire/modules/account/views/users.php",
+		"/Users/X/Documents/Git/insideGOOD/bonfire/application/views/core/new_header.php",
+		"/Users/X/Documents/Git/insideGOOD/bonfire/application/views/public/footer.php",
+		"/Users/X/Desktop/Parse-wow.php",
+		"/Users/X/Documents/Git/insideGOOD/bonfire/application/errors/error_404.php",
+		"/Users/X/Documents/Git/php/index.php",
+		"/Users/X/Documents/Git/insideGOOD/bonfire/modules/users/views/users/login.php",
+		"/Users/X/Documents/Git/insideGOOD/bonfire/application/config/database.php",
+		"/Users/X/Documents/Git/insideGOOD/bonfire/application/config/application.php",
+		"/Users/X/Documents/Git/insideGOOD/bonfire/application/config/config.php",
+		"/Users/X/Documents/Git/insideGOOD/.htaccess",
+		"/Users/X/Documents/Git/insideGOOD/1.htaccess",
+		"/Users/X/Documents/Git/insideGOOD/resources/css/ig.css",
+		"/Users/X/Documents/Git/insideGOOD/bonfire/application/config/constants.php",
+		"/Users/X/Documents/Git/insideGOOD/bonfire/application/views/public/features.php",
+		"/Users/X/Documents/Git/insideGOOD/unit_test.php",
+		"/Users/X/Library/Application Support/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
+		"/Users/X/Documents/Git/insideGOOD/application/controllers/account.php",
+		"/Users/X/Documents/Git/insideGOOD/application/controllers/auth.php"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			"/Applications/World of Warcraft/Interface/AddOns/Updates",
+			"/Applications/World of Warcraft/Interface/AddOns/Ace",
+			"",
+			"/Users/X/Documents/Git/insideGOOD/assets/images",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"debuffDuration",
+			"cooldown",
+			"jps.hp()",
+			"efaultTargetHP",
+			"jps.mana()",
+			"channeling",
+			"healTarget",
+			"jps.Healing",
+			"last",
+			"for next cast",
+			"Set to",
+			"Tick",
+			"jps.moving",
+			"jps.Moving",
+			"jps.moving",
+			"mydebuff",
+			"gui_toggleInt",
+			"Multi",
+			"jps.hp()",
+			"dizz",
+			"targetHealth",
+			"      or",
+			" 			or",
+			"       and",
+			"jps.hp()",
+			"mydebuff",
+			"cleanseTarget",
+			"jps.castTimeLeft",
+			"FindMeADispelTarget",
+			"cleanseTarget",
+			"findMeATank()",
+			"jps.glovesCooldown",
+			"ControlKey",
+			"/use",
+			"use",
+			"FindMeADispelTarget",
+			"36",
+			"cast",
+			"last",
+			"mydebuff",
+			"hp",
+			"hP",
+			"hp",
+			"hP",
+			"hp",
+			"jps.hp()",
+			"ub",
+			"ace.Interrupts",
+			"and jps.UseCDs",
+			"Slam",
+			"last",
+			"Moving",
+			"isMoving",
+			"target",
+			"\\\\jps\\\\",
+			"\\\\jps",
+			"debuffstacks",
+			"inRange",
+			"ud(\"target\",",
+			"ub(\"player\",",
+			"ub",
+			"macro",
+			"rmt",
+			"macro",
+			"==",
+			" <= ",
+			" >= ",
+			" == ",
+			"jps",
+			"JPS",
+			"Dragon Roar",
+			"== ",
+			" == ",
+			"target",
+			"Berserker Rage",
+			"Heroic Strike",
+			"berserk",
+			"green",
+			"playerHealth",
+			"thrash",
+			"mangle",
+			"debuff",
+			"get_debuff_stacks",
+			"frenzied regeneration",
+			"Power",
+			"Berserker Rage",
+			"skull",
+			"Pummel",
+			"jps.debuffStacks",
+			" vertical-align=\"middle\"",
+			"valign=\"center\"",
+			"style=\"padding:5px\"",
+			"top",
+			"&nbsp;",
+			"id=\"ctl00_cpMain_rptPartners_ctl01__lnkPartner\" ",
+			"pew",
+			"phone",
+			"Phone",
+			"register",
+			"delete",
+			"favicon",
+			"favison",
+			"Feedback U",
+			"404 Page not found",
+			"404",
+			"error",
+			"alert",
+			"bar"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "monk_brewmaster.lua",
+					"settings":
+					{
+						"buffer_size": 4958,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3875,
+								3875
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "warrior_fury.lua",
+					"settings":
+					{
+						"buffer_size": 4793,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4134,
+								4134
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "warrior_prot.lua",
+					"settings":
+					{
+						"buffer_size": 5712,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2404,
+								2404
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage",
+							"tab_size": 3,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "warrior_arms.lua",
+					"settings":
+					{
+						"buffer_size": 3824,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1074,
+								1074
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage",
+							"tab_size": 3,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "druid_balance.lua",
+					"settings":
+					{
+						"buffer_size": 3605,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2878,
+								2878
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"replace":
+	{
+		"height": 0.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 216.0,
+	"status_bar_visible": true
+}

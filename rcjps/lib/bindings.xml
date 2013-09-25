@@ -1,0 +1,17 @@
+<Bindings>
+	<Binding name="JPSTOGGLE" description="Toggle JPS Status" header="JPS">
+		jps.gui_toggleEnabled()
+	</Binding>
+	<Binding name="JPSTOGGLEMULTI" description="Toggle Multi Target" header="JPS">
+		jps.gui_toggleMulti()
+	</Binding>
+	<Binding name="JPSTOGGLECD" description="Toggle Cooldown Usage" header="JPS">
+		jps.gui_toggleCDs()
+	</Binding>
+	<Binding name="JPSTOGGLEINT" description="Toggle Interrupts" header="JPS">
+		jps.gui_toggleInt()
+	</Binding>
+	<Binding name="JPSTOGGLEDEF" description="Toggle Defensive Mode" header="JPS">
+		jps.gui_toggleDef()
+	</Binding>
+</Bindings>
