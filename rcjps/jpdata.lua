@@ -421,6 +421,12 @@ function jps.findMeAggroTank()
 	end
 	return "player"
 end
+function jps.findMeAggroNotTank(tank1,tank2)
+	for unit,_ in pairs(jps.RaidStatus) do
+		if jps_CalcThreat(unit)==3 and unit~=tank1 and unit~=tank2 then return unit end
+	end
+	return "player"
+end
 function jps.resetTimer(name)
 	jps.Timers[name]=nil
 end
