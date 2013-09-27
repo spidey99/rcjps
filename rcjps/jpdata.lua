@@ -388,18 +388,13 @@ function jps.couldBeTank(unit)
 	elseif jps.buff("righteous fury",unit) then return true
 	elseif jps.buff("blood presence",unit) then return true
 	elseif jps.buff("bear form",unit) then return true
+	elseif jps.buff( "ox stance",unit ) then return true
 	end
 end
 function jps.findMeATank()
 	if UnitExists("focus") then return "focus" end
 	for unit,_ in pairs(jps.RaidStatus) do
 		if jps.couldBeTank(unit) then return unit end
-	end
-	return "player"
-end
-function jps.findMeASecondTank(firstTank)
-	for unit,_ in pairs(jps.RaidStatus) do
-		if jps.couldBeTank(unit) and unit ~= firstTank then return unit end
 	end
 	return "player"
 end
@@ -456,14 +451,4 @@ function jps.useTrinket(id)
 	local xb8ef09,_=GetItemSpell(trinketId)
 	if(not xb8ef09) then return false end
 	return {"macro","/use "..xa0cdc9}
-end
-
-function jps.getNumberOfPlayersUnderXHealth(health)
-	local numUnder = 0
-	for unit,_ in pairs(jps.RaidStatus) do
-		if jps.hp(unit)<health then 
-			numUnder=numUnder+1 
-		end
-	end
-	return numUnder
 end

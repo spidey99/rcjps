@@ -499,6 +499,7 @@ function jps.couldBeTank( unit )
 	elseif jps.buff( "righteous fury",unit ) then return true
 	elseif jps.buff( "blood presence",unit ) then return true
 	elseif jps.buff( "bear form",unit ) then return true
+	elseif jps.buff( "ox stance",unit ) then return true
 	end
 end
 
