@@ -3,7 +3,7 @@ function druid_resto(self)
 
 	--settings
 	-- 0 mana --->conservative_healing_mana_threshold--->**normal raid healing**--->conservative_healing_mana_threshold--->100% mana
-	local chart_top_mana_threshold = 85
+	local chart_top_mana_threshold = 90
 	local conservative_healing_mana_threshold = 15
 	local oom = 11  --should be just above the cost of a tranquility
 	--use trinkets on cd?
@@ -30,6 +30,7 @@ function druid_resto(self)
 	local tank1Name,realm = UnitName(tank1)
 	local tank2Name,realm = UnitName(tank2)
 	--target of boss
+	--[[
 	if(boss1==tank1Name) then
 		lifebloom_Tank = tank1
 	elseif(boss1==tank2Name) then
@@ -61,7 +62,14 @@ function druid_resto(self)
 	else
 		lifebloom_Tank = jps.findMeAggroTank()
 	end
-
+	--]]
+	if(IsSpellInRange("lifebloom", tank1))then
+		lifebloom_Tank = tank1
+	elseif(IsSpellInRange("lifebloom", tank2))then
+		lifebloom_Tank = tank2
+	else
+		lifebloom_Tank = me
+	end
 	--Get the health of our decided targets
 	local defaultHP = jps.hpInc(defaultTarget)
 	local tank1HP = jps.hpInc(tank1)
@@ -120,11 +128,10 @@ function druid_resto(self)
 			
 				--aoe heals
 			{ "wild growth", 				jps.getNumberOfPlayersUnderXHealth(.50)>4, defaultTarget }, --untested
-			{ "heart of the wild",			jps.getNumberOfPlayersUnderXHealth(.50)>5}, --untested
-			{ "tranquility", 				not jps.Moving and jps.getNumberOfPlayersUnderXHealth(.50)>5 or jps.buff("heart of the wild") }, --untested
+			{ "heart of the wild",			jps.getNumberOfPlayersUnderXHealth(.70)>5}, --untested
+			{ "tranquility", 				not jps.Moving and jps.getNumberOfPlayersUnderXHealth(.70)>5 or jps.buff("heart of the wild") }, --untested
 				--rolling rejuvs
 			{ "rejuvenation",				defaultHP < 0.35 and jps.getNumberOfPlayersUnderXHealth(.40)>5 and (not jps.buff("rejuvenation",defaultTarget) or jps.buffDuration("rejuvenation",defaultTarget) < 1), defaultTarget },
-			{ "force of nature", 			jps.getNumberOfPlayersUnderXHealth(.50)>5, defaultTarget },
 			
 			
 			--everyone else
@@ -169,18 +176,20 @@ function druid_resto(self)
 			
 			
 				--tank bloom upkeep/switch
-			{ "lifebloom",					jps.buffDuration("lifebloom",lifebloom_Tank) < 1.5 or jps.buffStacks("lifebloom",lifebloom_Tank) <lifebloom_Tank},
+			{ "lifebloom",					jps.buffDuration("lifebloom",lifebloom_Tank) < 1.5 or jps.buffStacks("lifebloom",lifebloom_Tank) < 3,lifebloom_Tank},
 			
 				--aoe heals
 			{ "wild growth", 				jps.getNumberOfPlayersUnderXHealth(.95)>3, defaultTarget }, --untested
+			{ "force of nature", 			jps.getNumberOfPlayersUnderXHealth(.90)>3, defaultTarget },
+			
 				
 				--Decurse
 			{ "nature's cure",				cleanseTarget~=nil, cleanseTarget }, --untested
 
 				--default heals
-			{ "regrowth",					not jps.Moving and defaultHP < 0.60 or (jps.buff("clearcasting") and defaultHP < 0.75), defaultTarget },
-			{ "swiftmend",					defaultHP < 0.75 and (jps.buff("rejuvenation",defaultTarget) or jps.buff("regrowth",defaultTarget)), defaultTarget },
-			{ "rejuvenation",				defaultHP < 0.85 and (not jps.buff("rejuvenation",defaultTarget) or jps.buffDuration("rejuvenation",defaultTarget) < 1), defaultTarget },
+			{ "regrowth",					not jps.Moving and defaultHP < 0.60 or (jps.buff("clearcasting") and defaultHP < 0.85), defaultTarget },
+			{ "swiftmend",					defaultHP < 0.90 and (jps.buff("rejuvenation",defaultTarget) or jps.buff("regrowth",defaultTarget)), defaultTarget },
+			{ "rejuvenation",				defaultHP < 0.90 and (not jps.buff("rejuvenation",defaultTarget) or jps.buffDuration("rejuvenation",defaultTarget) < 1), defaultTarget },
 			
 			--add nature's swiftness use if buff is going to expire
 
@@ -235,11 +244,10 @@ function druid_resto(self)
 			
 				--aoe heals
 			{ "wild growth", 				jps.getNumberOfPlayersUnderXHealth(.50)>4, defaultTarget }, --untested
-			{ "heart of the wild",			jps.getNumberOfPlayersUnderXHealth(.50)>5}, --untested
-			{ "tranquility", 				not jps.Moving and jps.getNumberOfPlayersUnderXHealth(.50)>5 or jps.buff("heart of the wild") }, --untested
+			{ "heart of the wild",			jps.getNumberOfPlayersUnderXHealth(.65)>5}, --untested
+			{ "tranquility", 				not jps.Moving and jps.getNumberOfPlayersUnderXHealth(.65)>5 or jps.buff("heart of the wild") }, --untested
 				--rolling rejuvs
 			{ "rejuvenation",				defaultHP < 0.35 and jps.getNumberOfPlayersUnderXHealth(.40)>5 and (not jps.buff("rejuvenation",defaultTarget) or jps.buffDuration("rejuvenation",defaultTarget) < 1), defaultTarget },
-			{ "force of nature", 			jps.getNumberOfPlayersUnderXHealth(.50)>5, defaultTarget },
 			
 			
 			--everyone else
@@ -261,7 +269,7 @@ function druid_resto(self)
 			
 			{ "regrowth",					not jps.Moving and jps.buff("clearcasting") and jps.hpInc(me) < 0.70 or jps.hpInc(me) < 0.50, me },
 			
-			{ "rejuvenation",				jps.hpInc(me) <= 0.85 and (not jps.buff("rejuvenation",me) or jps.buffDuration("rejuvenation",me) < 1), me },
+			{ "rejuvenation",				jps.hpInc(me) <= 0.70 and (not jps.buff("rejuvenation",me) or jps.buffDuration("rejuvenation",me) < 1), me },
 			
 			--tank checks (doubled for two tank)
 			{ "swiftmend",		    		jps.hpInc(tank1) <= 0.75 and (jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) > 0), tank1 },
@@ -284,15 +292,16 @@ function druid_resto(self)
 			{ "lifebloom",					(jps.buffDuration("lifebloom",lifebloom_Tank) < 1.5 or jps.buffStacks("lifebloom",lifebloom_Tank) < 3), lifebloom_Tank },
 			
 				--aoe heals
-			{ "wild growth", 				jps.getNumberOfPlayersUnderXHealth(.85)>3, defaultTarget }, --untested
-				
+			{ "wild growth", 				jps.getNumberOfPlayersUnderXHealth(.75)>3, defaultTarget }, --untested
+			{ "force of nature", 			jps.getNumberOfPlayersUnderXHealth(.80)>3, defaultTarget },
+							
 				--Decurse
 			{ "nature's cure",				cleanseTarget~=nil, cleanseTarget }, --untested
 
 				--default heals
 			{ "regrowth",					not jps.Moving and defaultHP < 0.35 or (jps.buff("clearcasting") and defaultHP < 0.75), defaultTarget },
 			{ "swiftmend",					defaultHP < 0.60 and (jps.buff("rejuvenation",defaultTarget) or jps.buff("regrowth",defaultTarget)), defaultTarget },
-			{ "rejuvenation",				defaultHP < 0.75 and (not jps.buff("rejuvenation",defaultTarget) or jps.buffDuration("rejuvenation",defaultTarget) < 1), defaultTarget },
+			{ "rejuvenation",				defaultHP < 0.60 and (not jps.buff("rejuvenation",defaultTarget) or jps.buffDuration("rejuvenation",defaultTarget) < 1), defaultTarget },
 			
 			--add nature's swiftness use if buff is going to expire
 
@@ -323,7 +332,6 @@ function druid_resto(self)
 			{ "regrowth",					playerMana <= oom and not jps.Moving and myHP < 0.15, me },
 			{ "rejuvenation",				playerMana > oom and jps.Moving and myHP < 0.45 and (not jps.buff("rejuvenation",me) or jps.buffDuration("rejuvenation",me) < 1), me },
 			{ "rejuvenation",				playerMana <= oom and jps.Moving and myHP < 0.25 and (not jps.buff("rejuvenation",me) or jps.buffDuration("rejuvenation",me) < 1), me },
-				--attempt to save our ass with the free heal
 			{ "force of nature", 			myHP < .40, me },	
 						
 			--tank checks (doubled for two tank)  (these casts veto mana concerns b/c if tanks drop at this point it's generally a wipe)
@@ -338,18 +346,18 @@ function druid_resto(self)
 			{ "healing touch", 				jps.buff("nature's swiftness") and tank1HP < 0.50, tank1 },--ns use moved for guaranteed use
 			{ "nature's swiftness", 		tank2HP < 0.45 },
 			{ "healing touch", 				jps.buff("nature's swiftness") and tank2HP < 0.50, tank2 },--ns use moved for guaranteed use
-			{ "regrowth",					not jps.Moving and jps.hpInc(tank1) < 0.40, tank1 },
-			{ "regrowth",					not jps.Moving and jps.hpInc(tank2) < 0.40, tank2 },
-			{ "rejuvenation",				jps.Moving and tank1HP < 0.35 and (not jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) < 1), tank1 },
-			{ "rejuvenation",				jps.Moving and tank2HP < 0.35 and (not jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) < 1), tank2 },
+			{ "regrowth",					not jps.Moving and jps.hpInc(tank1) < 0.35, tank1 },
+			{ "regrowth",					not jps.Moving and jps.hpInc(tank2) < 0.35, tank2 },
+			{ "rejuvenation",				jps.Moving and tank1HP < 0.50 and (not jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) < 1), tank1 },
+			{ "rejuvenation",				jps.Moving and tank2HP < 0.50 and (not jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) < 1), tank2 },
 			
 				--aoe heals
 			{ "wild growth", 				playerMana > oom and jps.getNumberOfPlayersUnderXHealth(.50)>5, defaultTarget }, --untested
 			{ "heart of the wild",			jps.getNumberOfPlayersUnderXHealth(.35)>6}, --untested
-			{ "tranquility", 				not jps.Moving and jps.getNumberOfPlayersUnderXHealth(.35)>6 or jps.buff("heart of the wild") }, --untested
+			{ "tranquility", 				not jps.Moving and jps.getNumberOfPlayersUnderXHealth(.50)>5 or jps.buff("heart of the wild") }, --untested
 				--rolling rejuvs
 			{ "rejuvenation",				playerMana > oom and defaultHP < 0.25 and jps.getNumberOfPlayersUnderXHealth(.30)>5 and (not jps.buff("rejuvenation",defaultTarget) or jps.buffDuration("rejuvenation",defaultTarget) < 1), defaultTarget },
-			{ "force of nature", 			jps.getNumberOfPlayersUnderXHealth(.20)>5, defaultTarget }, --getting greedy with the fon's so we can save ourselves
+			{ "force of nature", 			jps.getNumberOfPlayersUnderXHealth(65)>3, defaultTarget }, --getting greedy with the fon's so we can save ourselves
 			
 			
 			--everyone else
@@ -357,7 +365,7 @@ function druid_resto(self)
 			{ "nature's swiftness", 		defaultHP < 0.25 },
 			{ "healing touch", 				jps.buff("nature's swiftness") and defaultHP < 0.35, defaultTarget },
 			
-			{ "swiftmend",					defaultHP < 0.20 and (jps.buff("rejuvenation",defaultTarget) or jps.buff("regrowth",defaultTarget)), defaultTarget },
+			{ "swiftmend",					playerMana > oom and defaultHP < 0.20 and (jps.buff("rejuvenation",defaultTarget) or jps.buff("regrowth",defaultTarget)), defaultTarget },
 			
 			{ "regrowth",					playerMana > oom and not jps.Moving and defaultHP < 0.20, defaultTarget },
 			{ "rejuvenation",				playerMana > oom and jps.Moving and defaultHP < 0.15 and (not jps.buff("rejuvenation",defaultTarget) or jps.buffDuration("rejuvenation",defaultTarget) < 1), defaultTarget },
