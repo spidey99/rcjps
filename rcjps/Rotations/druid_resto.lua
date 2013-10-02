@@ -2,7 +2,7 @@ function druid_resto(self)
 	local testMode = false
 
 	--settings
-	-- 0 mana --->conservative_healing_mana_threshold--->**normal raid healing**--->conservative_healing_mana_threshold--->100% mana
+	-- 0 mana --->conservative_healing_mana_threshold--->**normal raid healing**--->chart_top_mana_threshold--->100% mana
 	local chart_top_mana_threshold = 90
 	local conservative_healing_mana_threshold = 15
 	local oom = 11  --should be just above the cost of a tranquility
@@ -22,7 +22,16 @@ function druid_resto(self)
 	--non tank with aggro or targetted
 	local non_tank_aggrod = jps.findMeAggroNotTank(tank1,tank2) --untested
 	
+	local tank1_can_heal = canHeal(tank1)
+	local tank2_can_heal = canHeal(tank2)
 	
+	local defaultHP = jps.hpInc(defaultTarget)
+	local tank1HP = jps.hpInc(tank1)
+	local tank2HP = jps.hpInc(tank2)
+	local myHP = jps.hpInc(me)
+	
+	local Raid = {}
+	Raid = getRaidInfo(Raid)
 	local lifebloom_Tank
 	--lifebloom tank target logic --experimental
 	--[[
@@ -70,26 +79,30 @@ function druid_resto(self)
 		--to prevent spam, check for buff, then if buffduration>x reselect same target --todo
 			--perhaps utilize a timer in the future??
 		--refresh stacks with under 3sec left or they won't be moved
-	if(jps.buffDuration("lifebloom",tank1) < 3 and IsSpellInRange("lifebloom", tank1) and jps.canHeal(tank1)) then
+	if(jps.buffDuration("lifebloom",tank1) < 3 and jps.buff("lifebloom",tank1) and tank1_can_heal) then
 		lifebloom_Tank = tank1
-	elseif(jps.buffDuration("lifebloom",tank2) < 3 and IsSpellInRange("lifebloom", tank2) and jps.canHeal(tank2)) then
+	elseif(jps.buffDuration("lifebloom",tank2) < 3 and jps.buff("lifebloom",tank2) and tank2_can_heal) then
 		lifebloom_Tank = tank2
-	elseif(IsSpellInRange("lifebloom", tank1) and jps.canHeal(tank1) and jps_CalcThreat(tank1)==3) then
+	--elseif(tank1_can_heal and jps_CalcThreat(tank1)==3) then
+		--lifebloom_Tank = tank1
+	--elseif(tank2_can_heal and jps_CalcThreat(tank2)==3) then
+		--lifebloom_Tank = tank2
+	elseif(tank1_can_heal and jps.buff("lifebloom",tank1))then
 		lifebloom_Tank = tank1
-	elseif(IsSpellInRange("lifebloom", tank2) and jps.canHeal(tank2) and jps_CalcThreat(tank2)==3) then
+	elseif(tank2_can_heal and jps.buff("lifebloom",tank2))then
 		lifebloom_Tank = tank2
-	elseif(IsSpellInRange("lifebloom", tank1) and jps.canHeal(tank1))then
+	elseif(tank1_can_heal)then
 		lifebloom_Tank = tank1
-	elseif(IsSpellInRange("lifebloom", tank2) and jps.canHeal(tank2))then
-		lifebloom_Tank = tank2
 	else
 		lifebloom_Tank = me
 	end
 	--Get the health of our decided targets
-	local defaultHP = jps.hpInc(defaultTarget)
-	local tank1HP = jps.hpInc(tank1)
-	local tank2HP = jps.hpInc(tank2)
-	local myHP = jps.hpInc(me)
+	if(jps.hpInc(defaultTarget)> jps.hpInc(me)) then
+		defaultTarget=me
+	end
+	
+	
+	
 
 	--tranquility protection
 	local channeling = UnitChannelInfo("player")
@@ -97,11 +110,18 @@ function druid_resto(self)
      return nil
   	end
 	
+	if(IsAltKeyDown() ~= nil ) then
+    		--print( string.format("jps.buffStacks(lifebloom,lifebloom_Tank) < 3: %s", tostring(jps.buffStacks("lifebloom",lifebloom_Tank) < 3)) )
+    		--print( string.format("playerMana > chart_top_mana_threshold: %s > %s: %s", playerMana, chart_top_mana_threshold, tostring(playerMana > chart_top_mana_threshold)) )
+  		end
 	local spellTable = nil
 	--heal chart topper mode for short pulls and low damage fights/periods (and just mostly full on mana in general)
-	if(playerMana > chart_top_mana_threshold) then --untested
+	if(playerMana > chart_top_mana_threshold) then
 
-
+		if(IsAltKeyDown() ~= nil ) then
+    		--print( string.format("jps.buffStacks(lifebloom,lifebloom_Tank) < 3 and canHeal(lifebloom_Tank): %s < 3 and %s", tostring(jps.buffStacks("lifebloom",lifebloom_Tank) < 3), tostring(canHeal(lifebloom_Tank))) )
+    		--print( string.format("lifebloom_Tank: %s", lifebloom_Tank) )
+  		end
 
 		spellTable =
 		{
@@ -126,28 +146,28 @@ function druid_resto(self)
 			{ "rejuvenation",				jps.Moving and myHP < 0.45 and (not jps.buff("rejuvenation",me) or jps.buffDuration("rejuvenation",me) < 1), me },
 						
 			--tank checks (doubled for two tank)
-			{ "rebirth", 					not jps.Moving and UnitIsDeadOrGhost(tank1) ~= nil and IsSpellInRange("rebirth", tank1), tank1 }, --untested
-			{ "rebirth", 					not jps.Moving and UnitIsDeadOrGhost(tank2) ~= nil and IsSpellInRange("rebirth", tank2), tank2 }, --untested
-			{ "ironbark", 					jps.hpInc(tank1) < 0.50 and jps.canHeal(tank1), tank1 },
-			{ "ironbark", 					jps.hpInc(tank2) < 0.50 and jps.canHeal(tank1), tank2 },
-			{ "swiftmend",		    		jps.hpInc(tank1) <= 0.55 and (jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) > 0) and jps.canHeal(tank1), tank1 },
-			{ "swiftmend",		    		jps.hpInc(tank2) <= 0.55 and (jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) > 0) and jps.canHeal(tank1), tank2 },
+			{ "rebirth", 					not jps.Moving and UnitIsDeadOrGhost(tank1) ~= nil, tank1 }, --untested
+			{ "rebirth", 					not jps.Moving and UnitIsDeadOrGhost(tank2) ~= nil, tank2 }, --untested
+			{ "ironbark", 					jps.hpInc(tank1) < 0.50 and tank1_can_heal, tank1 },
+			{ "ironbark", 					jps.hpInc(tank2) < 0.50 and tank1_can_heal, tank2 },
+			{ "swiftmend",		    		jps.hpInc(tank1) <= 0.55 and (jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) > 0) and tank1_can_heal, tank1 },
+			{ "swiftmend",		    		jps.hpInc(tank2) <= 0.55 and (jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) > 0) and tank1_can_heal, tank2 },
 				--ns use
-			{ "nature's swiftness", 		tank1HP < 0.55  and jps.canHeal(tank1)},
-			{ "healing touch", 				jps.buff("nature's swiftness") and tank1HP < 0.60  and jps.canHeal(tank1), tank1 },--ns use moved for guaranteed use
-			{ "nature's swiftness", 		tank2HP < 0.55  and jps.canHeal(tank2)},
-			{ "healing touch", 				jps.buff("nature's swiftness") and tank2HP < 0.60 and jps.canHeal(tank2), tank2 },--ns use moved for guaranteed use
-			{ "regrowth",					not jps.Moving and jps.hpInc(tank1) < 0.50 and jps.canHeal(tank1), tank1 },
-			{ "regrowth",					not jps.Moving and jps.hpInc(tank2) < 0.50 and jps.canHeal(tank2), tank2 },
-			{ "rejuvenation",				jps.Moving and tank1HP < 0.45 and (not jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) < 1) and jps.canHeal(tank1), tank1 },
-			{ "rejuvenation",				jps.Moving and tank2HP < 0.45 and (not jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) < 1) and jps.canHeal(tank2), tank2 },
+			{ "nature's swiftness", 		tank1HP < 0.55  and tank1_can_heal},
+			{ "healing touch", 				jps.buff("nature's swiftness") and tank1HP < 0.60  and tank1_can_heal, tank1 },--ns use moved for guaranteed use
+			{ "nature's swiftness", 		tank2HP < 0.55  and tank2_can_heal},
+			{ "healing touch", 				jps.buff("nature's swiftness") and tank2HP < 0.60 and tank2_can_heal, tank2 },--ns use moved for guaranteed use
+			{ "regrowth",					not jps.Moving and jps.hpInc(tank1) < 0.50 and tank1_can_heal, tank1 },
+			{ "regrowth",					not jps.Moving and jps.hpInc(tank2) < 0.50 and tank2_can_heal, tank2 },
+			{ "rejuvenation",				jps.Moving and tank1HP < 0.45 and (not jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) < 1) and tank1_can_heal, tank1 },
+			{ "rejuvenation",				jps.Moving and tank2HP < 0.45 and (not jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) < 1) and tank2_can_heal, tank2 },
 			
 				--aoe heals
-			{ "wild growth", 				jps.getNumberOfPlayersUnderXHealth(.50)>4, defaultTarget }, --untested
-			{ "heart of the wild",			jps.getNumberOfPlayersUnderXHealth(.70)>5}, --untested
-			{ "tranquility", 				not jps.Moving and jps.getNumberOfPlayersUnderXHealth(.70)>5 or jps.buff("heart of the wild") }, --untested
+			{ "wild growth", 				jps.getNumberOfPlayersUnderXHealth(.50, Raid)>4, defaultTarget }, --untested
+			{ "heart of the wild",			jps.getNumberOfPlayersUnderXHealth(.70, Raid)>5}, --untested
+			{ "tranquility", 				not jps.Moving and jps.getNumberOfPlayersUnderXHealth(.70, Raid)>=5 or jps.buff("heart of the wild") }, --untested
 				--rolling rejuvs
-			{ "rejuvenation",				defaultHP < 0.35 and jps.getNumberOfPlayersUnderXHealth(.40)>5 and (not jps.buff("rejuvenation",defaultTarget) or jps.buffDuration("rejuvenation",defaultTarget) < 1), defaultTarget },
+			{ "rejuvenation",				defaultHP < 0.35 and jps.getNumberOfPlayersUnderXHealth(.40, Raid)>5 and (not jps.buff("rejuvenation",defaultTarget) or jps.buffDuration("rejuvenation",defaultTarget) < 1), defaultTarget },
 			
 			
 			--everyone else
@@ -175,12 +195,15 @@ function druid_resto(self)
 			--tank checks (doubled for two tank)
 			{ "ironbark", 					jps.hpInc(tank1) < 0.75, tank1 },
 			{ "ironbark", 					jps.hpInc(tank2) < 0.75, tank2 },
-			{ "swiftmend",		    		jps.hpInc(tank1) <= 0.75 and (jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) > 0) and jps.canHeal(tank1), tank1 },
-			{ "swiftmend",		    		jps.hpInc(tank2) <= 0.75 and (jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) > 0) and jps.canHeal(tank2), tank2 },
-			{ "regrowth",					not jps.Moving and jps.buff("clearcasting") and (jps.hpInc(tank1) < 0.80 or jps.buffDuration("lifebloom",tank1) < 5 and jps.buffDuration("lifebloom",tank1) < 1.5) or jps.hpInc(tank1) < 0.70 and jps.canHeal(tank1), tank1 },
-			{ "regrowth",					not jps.Moving and jps.buff("clearcasting") and (jps.hpInc(tank2) < 0.80 or jps.buffDuration("lifebloom",tank2) < 5 and jps.buffDuration("lifebloom",tank2) < 1.5) or jps.hpInc(tank2) < 0.70 and jps.canHeal(tank2), tank2 },
-			{ "rejuvenation",				jps.hpInc(tank1) <= 0.99 and (not jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) < 1) and jps.canHeal(tank1), tank1 },
-			{ "rejuvenation",				jps.hpInc(tank2) <= 0.99 and (not jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) < 1) and jps.canHeal(tank2), tank2 },
+			{ "swiftmend",		    		jps.hpInc(tank1) <= 0.75 and (jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) > 0) and tank1_can_heal, tank1 },
+			{ "swiftmend",		    		jps.hpInc(tank2) <= 0.75 and (jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) > 0) and tank2_can_heal, tank2 },
+			--
+			--add 1.5 sec check for lb stack refresh
+			--
+			{ "regrowth",					not jps.Moving and jps.buff("clearcasting") and (jps.hpInc(tank1) < 0.80 or jps.buffDuration("lifebloom",tank1) < 5 and jps.buffDuration("lifebloom",tank1) > 1.5) or jps.hpInc(tank1) < 0.70 and tank1_can_heal, tank1 },
+			{ "regrowth",					not jps.Moving and jps.buff("clearcasting") and (jps.hpInc(tank2) < 0.80 or jps.buffDuration("lifebloom",tank2) < 5 and jps.buffDuration("lifebloom",tank2) > 1.5) or jps.hpInc(tank2) < 0.70 and tank2_can_heal, tank2 },
+			{ "rejuvenation",				jps.hpInc(tank1) <= 0.99 and (not jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) < 1) and tank1_can_heal, tank1 },
+			{ "rejuvenation",				jps.hpInc(tank2) <= 0.99 and (not jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) < 1) and tank2_can_heal, tank2 },
 			
 			--cds
 			{ "Nature's Vigil", 			jps.UseCDs},
@@ -192,26 +215,27 @@ function druid_resto(self)
 			
 			
 				--tank bloom upkeep/switch
-			{ "lifebloom",					jps.buffDuration("lifebloom",lifebloom_Tank) < 1.5 or jps.buffStacks("lifebloom",lifebloom_Tank) < 3 and jps.canHeal(lifebloom_Tank),lifebloom_Tank},
+			{ "lifebloom",					jps.buffDuration("lifebloom",lifebloom_Tank) < 1.5 or jps.buffStacks("lifebloom",lifebloom_Tank) < 3,lifebloom_Tank},
 			
 				--aoe heals
-			{ "wild growth", 				jps.getNumberOfPlayersUnderXHealth(.95)>3, defaultTarget }, --untested
-			{ "force of nature", 			jps.getNumberOfPlayersUnderXHealth(.90)>3, defaultTarget },
+			{ "wild growth", 				jps.getNumberOfPlayersUnderXHealth(.95, Raid)>3, defaultTarget }, --untested
+			{ "force of nature", 			jps.getNumberOfPlayersUnderXHealth(.90, Raid)>3, defaultTarget },
 			
 				
 				--Decurse
 			{ "nature's cure",				cleanseTarget~=nil, cleanseTarget }, --untested
 
 				--default heals
-			{ "regrowth",					not jps.Moving and defaultHP < 0.60 or (jps.buff("clearcasting") and defaultHP < 0.85), defaultTarget },
+			{ "regrowth",					not jps.Moving and defaultHP < 0.75 or (jps.buff("clearcasting") and defaultHP < 0.85), defaultTarget },
 			{ "swiftmend",					defaultHP < 0.90 and (jps.buff("rejuvenation",defaultTarget) or jps.buff("regrowth",defaultTarget)), defaultTarget },
 			{ "rejuvenation",				defaultHP < 0.90 and (not jps.buff("rejuvenation",defaultTarget) or jps.buffDuration("rejuvenation",defaultTarget) < 1), defaultTarget },
 			
 			--add nature's swiftness use if buff is going to expire
 
 		}
-	--normal raid heal mode
 	elseif(playerMana <= chart_top_mana_threshold and playerMana > conservative_healing_mana_threshold) then --untested
+		--normal raid heal mode
+	
 		--[[ stop casting if conflicting heals ->>>todo
 		if(true) then
 		SpellStopCasting()
@@ -241,31 +265,31 @@ function druid_resto(self)
 			{ "rejuvenation",				jps.Moving and myHP < 0.40 and (not jps.buff("rejuvenation",me) or jps.buffDuration("rejuvenation",me) < 1), me },
 						
 			--tank checks (doubled for two tank)
-			{ "rebirth", 					not jps.Moving and UnitIsDeadOrGhost(tank1) ~= nil and IsSpellInRange("rebirth", tank1), tank1 }, --untested
-			{ "rebirth", 					not jps.Moving and UnitIsDeadOrGhost(tank2) ~= nil and IsSpellInRange("rebirth", tank2), tank2 }, --untested
-			{ "ironbark", 					jps.hpInc(tank1) < 0.50 and jps.canHeal(tank1), tank1 },
-			{ "ironbark", 					jps.hpInc(tank2) < 0.50 and jps.canHeal(tank2), tank2 },
-			{ "swiftmend",		    		jps.hpInc(tank1) <= 0.55 and (jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) > 0) and jps.canHeal(tank1), tank1 },
-			{ "swiftmend",		    		jps.hpInc(tank2) <= 0.55 and (jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) > 0) and jps.canHeal(tank2), tank2 },
+			{ "rebirth", 					not jps.Moving and UnitIsDeadOrGhost(tank1) ~= nil, tank1 }, --untested
+			{ "rebirth", 					not jps.Moving and UnitIsDeadOrGhost(tank2) ~= nil, tank2 }, --untested
+			{ "ironbark", 					jps.hpInc(tank1) < 0.50 and tank1_can_heal, tank1 },
+			{ "ironbark", 					jps.hpInc(tank2) < 0.50 and tank2_can_heal, tank2 },
+			{ "swiftmend",		    		jps.hpInc(tank1) <= 0.55 and (jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) > 0) and tank1_can_heal, tank1 },
+			{ "swiftmend",		    		jps.hpInc(tank2) <= 0.55 and (jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) > 0) and tank2_can_heal, tank2 },
 				--ns use
-			{ "nature's swiftness", 		tank1HP < 0.55  and jps.canHeal(tank1)},
-			{ "healing touch", 				jps.buff("nature's swiftness") and tank1HP < 0.60 and jps.canHeal(tank1), tank1 },--ns use moved for guaranteed use
-			{ "nature's swiftness", 		tank2HP < 0.55  and jps.canHeal(tank2)},
-			{ "healing touch", 				jps.buff("nature's swiftness") and tank2HP < 0.60 and jps.canHeal(tank2), tank2 },--ns use moved for guaranteed use
-			{ "regrowth",					not jps.Moving and jps.hpInc(tank1) < 0.50 and jps.canHeal(tank1), tank1 },
-			{ "regrowth",					not jps.Moving and jps.hpInc(tank2) < 0.50 and jps.canHeal(tank2), tank2 },
-			{ "rejuvenation",				jps.Moving and tank1HP < 0.45 and (not jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) < 1) and jps.canHeal(tank1), tank1 },
-			{ "rejuvenation",				jps.Moving and tank2HP < 0.45 and (not jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) < 1) and jps.canHeal(tank2), tank2 },
+			{ "nature's swiftness", 		tank1HP < 0.55  and tank1_can_heal},
+			{ "healing touch", 				jps.buff("nature's swiftness") and tank1HP < 0.60 and tank1_can_heal, tank1 },--ns use moved for guaranteed use
+			{ "nature's swiftness", 		tank2HP < 0.55  and tank2_can_heal},
+			{ "healing touch", 				jps.buff("nature's swiftness") and tank2HP < 0.60 and tank2_can_heal, tank2 },--ns use moved for guaranteed use
+			{ "regrowth",					not jps.Moving and jps.hpInc(tank1) < 0.50 and tank1_can_heal, tank1 },
+			{ "regrowth",					not jps.Moving and jps.hpInc(tank2) < 0.50 and tank2_can_heal, tank2 },
+			{ "rejuvenation",				jps.Moving and tank1HP < 0.45 and (not jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) < 1) and tank1_can_heal, tank1 },
+			{ "rejuvenation",				jps.Moving and tank2HP < 0.45 and (not jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) < 1) and tank2_can_heal, tank2 },
 			
 				--aoe heals
-			{ "wild growth", 				jps.getNumberOfPlayersUnderXHealth(.50)>4, defaultTarget }, --untested
-			{ "heart of the wild",			jps.getNumberOfPlayersUnderXHealth(.65)>5}, --untested
+			{ "wild growth", 				jps.getNumberOfPlayersUnderXHealth(.50, Raid)>4, defaultTarget }, --untested
+			{ "heart of the wild",			jps.getNumberOfPlayersUnderXHealth(.65, Raid)>5}, --untested
 			--
 			--move tranq up the priority queue? can keep tanks up and self up to some degree
 			--
-			{ "tranquility", 				not jps.Moving and jps.getNumberOfPlayersUnderXHealth(.65)>5 or jps.buff("heart of the wild") }, --untested
+			{ "tranquility", 				not jps.Moving and jps.getNumberOfPlayersUnderXHealth(.65, Raid)>5 or jps.buff("heart of the wild") }, --untested
 				--rolling rejuvs
-			{ "rejuvenation",				defaultHP < 0.35 and jps.getNumberOfPlayersUnderXHealth(.40)>5 and (not jps.buff("rejuvenation",defaultTarget) or jps.buffDuration("rejuvenation",defaultTarget) < 1), defaultTarget },
+			{ "rejuvenation",				defaultHP < 0.35 and jps.getNumberOfPlayersUnderXHealth(.40, Raid)>5 and (not jps.buff("rejuvenation",defaultTarget) or jps.buffDuration("rejuvenation",defaultTarget) < 1), defaultTarget },
 			
 			
 			--everyone else
@@ -290,12 +314,12 @@ function druid_resto(self)
 			{ "rejuvenation",				jps.hpInc(me) <= 0.70 and (not jps.buff("rejuvenation",me) or jps.buffDuration("rejuvenation",me) < 1), me },
 			
 			--tank checks (doubled for two tank)
-			{ "swiftmend",		    		jps.hpInc(tank1) <= 0.75 and (jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) > 0) and jps.canHeal(tank1), tank1 },
-			{ "swiftmend",		    		jps.hpInc(tank2) <= 0.75 and (jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) > 0) and jps.canHeal(tank2), tank2 },
-			{ "regrowth",					not jps.Moving and jps.buff("clearcasting") and (jps.hpInc(tank1) < 0.75 or jps.buffDuration("lifebloom",tank1) < 5 and jps.buffDuration("lifebloom",tank1) < 1.5) or jps.hpInc(tank1) < 0.60 and jps.canHeal(tank1), tank1 },
-			{ "regrowth",					not jps.Moving and jps.buff("clearcasting") and (jps.hpInc(tank2) < 0.75 or jps.buffDuration("lifebloom",tank2) < 5 and jps.buffDuration("lifebloom",tank2) < 1.5) or jps.hpInc(tank2) < 0.60 and jps.canHeal(tank2), tank2 },
-			{ "rejuvenation",				jps.hpInc(tank1) <= 0.99 and (not jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) < 1) and jps.canHeal(tank1), tank1 },
-			{ "rejuvenation",				jps.hpInc(tank2) <= 0.99 and (not jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) < 1) and jps.canHeal(tank2), tank2 },
+			{ "swiftmend",		    		jps.hpInc(tank1) <= 0.75 and (jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) > 0) and tank1_can_heal, tank1 },
+			{ "swiftmend",		    		jps.hpInc(tank2) <= 0.75 and (jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) > 0) and tank2_can_heal, tank2 },
+			{ "regrowth",					not jps.Moving and jps.buff("clearcasting") and (jps.hpInc(tank1) < 0.75 or jps.buffDuration("lifebloom",tank1) < 5 and jps.buffDuration("lifebloom",tank1) > 1.5) or jps.hpInc(tank1) < 0.60 and tank1_can_heal, tank1 },
+			{ "regrowth",					not jps.Moving and jps.buff("clearcasting") and (jps.hpInc(tank2) < 0.75 or jps.buffDuration("lifebloom",tank2) < 5 and jps.buffDuration("lifebloom",tank2) > 1.5) or jps.hpInc(tank2) < 0.60 and tank2_can_heal, tank2 },
+			{ "rejuvenation",				jps.hpInc(tank1) <= 0.99 and (not jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) < 1) and tank1_can_heal, tank1 },
+			{ "rejuvenation",				jps.hpInc(tank2) <= 0.99 and (not jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) < 1) and tank2_can_heal, tank2 },
 			
 			--cds
 			{ "Nature's Vigil", 			jps.UseCDs},
@@ -307,11 +331,11 @@ function druid_resto(self)
 			
 			
 				--tank bloom upkeep/switch
-			{ "lifebloom",					(jps.buffDuration("lifebloom",lifebloom_Tank) < 1.5 or jps.buffStacks("lifebloom",lifebloom_Tank) < 3)  and jps.canHeal(lifebloom_Tank), lifebloom_Tank },
+			{ "lifebloom",					( (jps.buffDuration("lifebloom",lifebloom_Tank) < 1.5 or jps.buffStacks("lifebloom",lifebloom_Tank) < 3) ), lifebloom_Tank },
 			
 				--aoe heals
-			{ "wild growth", 				jps.getNumberOfPlayersUnderXHealth(.75)>3, defaultTarget }, --untested
-			{ "force of nature", 			jps.getNumberOfPlayersUnderXHealth(.80)>3, defaultTarget },
+			{ "wild growth", 				jps.getNumberOfPlayersUnderXHealth(.75, Raid)>3, defaultTarget }, --untested
+			{ "force of nature", 			jps.getNumberOfPlayersUnderXHealth(.80, Raid)>3, defaultTarget },
 							
 				--Decurse
 			{ "nature's cure",				cleanseTarget~=nil, cleanseTarget }, --untested
@@ -325,8 +349,9 @@ function druid_resto(self)
 
 			
 		}
-	--mana conservation mode (leaves mana for tranq and oh shit situations while maintaining lb stacks and using cd's) Our goal is be as efficient as possible by making high efficienc spells available during ideal casting opportunities
 	elseif(playerMana <= conservative_healing_mana_threshold) then --untested
+		--mana conservation mode (leaves mana for tranq and oh shit situations while maintaining lb stacks and using cd's) Our goal is be as efficient as possible by making high efficienc spells available during ideal casting opportunities
+	
 		spellTable =
 		{
 			--Shift for mushroom placement
@@ -352,29 +377,29 @@ function druid_resto(self)
 			{ "force of nature", 			myHP < .40, me },	
 						
 			--tank checks (doubled for two tank)  (these casts veto mana concerns b/c if tanks drop at this point it's generally a wipe)
-			{ "rebirth", 					not jps.Moving and UnitIsDeadOrGhost(tank1) ~= nil and IsSpellInRange("rebirth", tank1) and jps.canHeal(tank1), tank1 }, --untested
-			{ "rebirth", 					not jps.Moving and UnitIsDeadOrGhost(tank2) ~= nil and IsSpellInRange("rebirth", tank2) and jps.canHeal(tank2), tank2 }, --untested
-			{ "ironbark", 					jps.hpInc(tank1) < 0.40 and jps.canHeal(tank1), tank1 },
-			{ "ironbark", 					jps.hpInc(tank2) < 0.40 and jps.canHeal(tank2), tank2 },
-			{ "swiftmend",		    		jps.hpInc(tank1) <= 0.45 and (jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) > 0) and jps.canHeal(tank1), tank1 },
-			{ "swiftmend",		    		jps.hpInc(tank2) <= 0.45 and (jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) > 0) and jps.canHeal(tank2), tank2 },
+			{ "rebirth", 					not jps.Moving and UnitIsDeadOrGhost(tank1) ~= nil, tank1 }, --untested
+			{ "rebirth", 					not jps.Moving and UnitIsDeadOrGhost(tank2) ~= nil, tank2 }, --untested
+			{ "ironbark", 					jps.hpInc(tank1) < 0.40 and tank1_can_heal, tank1 },
+			{ "ironbark", 					jps.hpInc(tank2) < 0.40 and tank2_can_heal, tank2 },
+			{ "swiftmend",		    		jps.hpInc(tank1) <= 0.45 and (jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) > 0) and tank1_can_heal, tank1 },
+			{ "swiftmend",		    		jps.hpInc(tank2) <= 0.45 and (jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) > 0) and tank2_can_heal, tank2 },
 				--ns use
-			{ "nature's swiftness", 		tank1HP < 0.45  and jps.canHeal(tank1)},
-			{ "healing touch", 				jps.buff("nature's swiftness") and tank1HP < 0.50 and jps.canHeal(tank1), tank1 },--ns use moved for guaranteed use
-			{ "nature's swiftness", 		tank2HP < 0.45  and jps.canHeal(tank2)},
-			{ "healing touch", 				jps.buff("nature's swiftness") and tank2HP < 0.50 and jps.canHeal(tank2), tank2 },--ns use moved for guaranteed use
-			{ "regrowth",					not jps.Moving and jps.hpInc(tank1) < 0.35 and jps.canHeal(tank1), tank1 },
-			{ "regrowth",					not jps.Moving and jps.hpInc(tank2) < 0.35 and jps.canHeal(tank2), tank2 },
-			{ "rejuvenation",				jps.Moving and tank1HP < 0.50 and (not jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) < 1) and jps.canHeal(tank1), tank1 },
-			{ "rejuvenation",				jps.Moving and tank2HP < 0.50 and (not jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) < 1) and jps.canHeal(tank2), tank2 },
+			{ "nature's swiftness", 		tank1HP < 0.45  and tank1_can_heal},
+			{ "healing touch", 				jps.buff("nature's swiftness") and tank1HP < 0.50 and tank1_can_heal, tank1 },--ns use moved for guaranteed use
+			{ "nature's swiftness", 		tank2HP < 0.45  and tank2_can_heal},
+			{ "healing touch", 				jps.buff("nature's swiftness") and tank2HP < 0.50 and tank2_can_heal, tank2 },--ns use moved for guaranteed use
+			{ "regrowth",					not jps.Moving and jps.hpInc(tank1) < 0.35 and tank1_can_heal, tank1 },
+			{ "regrowth",					not jps.Moving and jps.hpInc(tank2) < 0.35 and tank2_can_heal, tank2 },
+			{ "rejuvenation",				jps.Moving and tank1HP < 0.50 and (not jps.buff("rejuvenation",tank1) or jps.buffDuration("rejuvenation",tank1) < 1) and tank1_can_heal, tank1 },
+			{ "rejuvenation",				jps.Moving and tank2HP < 0.50 and (not jps.buff("rejuvenation",tank2) or jps.buffDuration("rejuvenation",tank2) < 1) and tank2_can_heal, tank2 },
 			
 				--aoe heals
-			{ "wild growth", 				playerMana > oom and jps.getNumberOfPlayersUnderXHealth(.50)>5, defaultTarget }, --untested
-			{ "heart of the wild",			jps.getNumberOfPlayersUnderXHealth(.35)>6}, --untested
-			{ "tranquility", 				not jps.Moving and jps.getNumberOfPlayersUnderXHealth(.50)>5 or jps.buff("heart of the wild") }, --untested
+			{ "wild growth", 				playerMana > oom and jps.getNumberOfPlayersUnderXHealth(.50, Raid)>5, defaultTarget }, --untested
+			{ "heart of the wild",			jps.getNumberOfPlayersUnderXHealth(.35, Raid)>6}, --untested
+			{ "tranquility", 				not jps.Moving and jps.getNumberOfPlayersUnderXHealth(.50, Raid)>5 or jps.buff("heart of the wild") }, --untested
 				--rolling rejuvs
-			{ "rejuvenation",				playerMana > oom and defaultHP < 0.25 and jps.getNumberOfPlayersUnderXHealth(.30)>5 and (not jps.buff("rejuvenation",defaultTarget) or jps.buffDuration("rejuvenation",defaultTarget) < 1), defaultTarget },
-			{ "force of nature", 			jps.getNumberOfPlayersUnderXHealth(65)>3, defaultTarget }, --getting greedy with the fon's so we can save ourselves
+			{ "rejuvenation",				playerMana > oom and defaultHP < 0.25 and jps.getNumberOfPlayersUnderXHealth(.30, Raid)>5 and (not jps.buff("rejuvenation",defaultTarget) or jps.buffDuration("rejuvenation",defaultTarget) < 1), defaultTarget },
+			{ "force of nature", 			jps.getNumberOfPlayersUnderXHealth(65, Raid)>3, defaultTarget }, --getting greedy with the fon's so we can save ourselves
 			
 			
 			--everyone else
@@ -401,7 +426,7 @@ function druid_resto(self)
 			
 			
 				--tank bloom upkeep/switch (trying to reduce lifebloom switching at low mana lvls)
-			{ "lifebloom",					jps.buffDuration("lifebloom",lifebloom_Tank) < 1.5 or jps.buffStacks("lifebloom",lifebloom_Tank) <lifebloom_Tank},
+			{ "lifebloom",					jps.buffDuration("lifebloom",lifebloom_Tank) < 1.5 or jps.buffStacks("lifebloom",lifebloom_Tank) < 3,lifebloom_Tank},
 
 				--Decurse
 			{ "nature's cure",				playerMana > oom and cleanseTarget~=nil, cleanseTarget }, --untested
@@ -427,11 +452,11 @@ function druid_resto(self)
 	local spell,target = parseSpellTable(spellTable)
 	jps.Target = target
 	-- Debug
-	--[[
-  	if IsAltKeyDown() ~= nil and spell then
-    	print( string.format("Healing: %s, Health: %s, Spell: %s", target, jps.hp(target), spell) )
+  	if (IsAltKeyDown() ~= nil and spell) then
+    	--print( string.format("Healing: %s, Health: %s, Spell: %s", target, jps.hp(target), spell) )
+    elseif(IsAltKeyDown() ~= nil ) then
+    	--print( string.format("lifebloom_Tank: %s", lifebloom_Tank) )
   	end
-  	--]]
 	return spell
 
 end
@@ -443,17 +468,42 @@ function jps.findMeASecondTank(firstTank)
 	return "player"
 end
 
-function jps.getNumberOfPlayersUnderXHealth(health)
+function jps.getNumberOfPlayersUnderXHealth(health, Raid)
 	local numUnder = 0
-	for unit,_ in pairs(jps.RaidStatus) do
-		if jps.hp(unit)<health and jps.canHeal(unit) then 
+	for unit,_ in pairs(Raid) do
+		if Raid[unit]<health then
 			numUnder=numUnder+1 
 		end
+		if IsAltKeyDown() ~= nil then
+    			print( string.format("unit %s: health %s", unit, Raid[unit]) )
+  			end
 	end
-	if IsAltKeyDown() ~= nil and spell then
-    	print( string.format("number of players under %s health: %s", health, numUnder) )
+	if IsAltKeyDown() ~= nil then
+    	--print( string.format("number of players under %s health: %s", health, numUnder) )
   	end
 	return numUnder
+end
+function getRaidInfo(Raid)
+	for unit,_ in pairs(jps.RaidStatus) do
+		Raid[unit] = jps.hp(unit)
+		if IsAltKeyDown() ~= nil then
+    		--print( string.format("number of players under %s health: %s", health, numUnder) )
+  		end
+	end
+	
+	return Raid
+end
+
+function canHeal(unit)
+	if unit=="player" then return true end
+	if UnitExists(unit)~=1 then return false end
+	if UnitIsVisible(unit)~=1 then return false end
+	if UnitIsFriend("player",unit)~=1 then return false end
+	if not UnitInRange(unit) then return false end
+	if UnitIsDeadOrGhost(unit)==1 then return false end
+	if jps.PlayerIsBlacklisted(unit) then return false end
+	
+	return true
 end
 --[[ --secondary aoe logic check found in priest_holy.lua
 function getNumberOfPlayersNeedHealing(healthPercentage)
