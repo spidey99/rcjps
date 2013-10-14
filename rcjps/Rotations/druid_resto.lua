@@ -101,14 +101,13 @@ function druid_resto(self)
 		defaultTarget=me
 	end
 	
-	
+	-- stop casting if conflicting heals ->>>todo
+	if(jps.hpInc("target")==1 and jps.LastCast ~= "tranquility" and not jps.buff("clearcasting")) then
+		SpellStopCasting()
+	end
 	
 
-	--tranquility protection
-	local channeling = UnitChannelInfo("player")
-  	if channeling then
-     return nil
-  	end
+	
 	
 	if(IsAltKeyDown() ~= nil ) then
     		--print( string.format("jps.buffStacks(lifebloom,lifebloom_Tank) < 3: %s", tostring(jps.buffStacks("lifebloom",lifebloom_Tank) < 3)) )
@@ -136,8 +135,8 @@ function druid_resto(self)
 			{ "lifebloom",					jps.buffStacks("lifebloom",me) < 3 and myHP < 0.45, me },
 						
 				--tank checks (doubled for two tank)
-			{ "rebirth", 					false and not jps.Moving, tank1 }, --untested
-			{ "rebirth", 					false and not jps.Moving, tank2 }, --untested
+			{ "rebirth", 					not jps.Moving and UnitIsDeadOrGhost(tank1) ~= nil, tank1 }, --untested
+			{ "rebirth", 					not jps.Moving and UnitIsDeadOrGhost(tank2) ~= nil, tank2 }, --untested
 			{ "ironbark", 					tank1HP < 0.50 and tank1_can_heal, tank1 },
 			{ "ironbark", 					tank2HP < 0.50 and tank1_can_heal, tank2 },
 			{ "regrowth",					tank1HP < 0.50 and tank1_can_heal, tank1 },
@@ -190,17 +189,13 @@ function druid_resto(self)
 			{ "nature's cure",				not oom and cleanseTarget~=nil, cleanseTarget }, --untested
 
 				--default heals
+			--nature's swiftness use if buff is going to expire
+			{ "healing touch", 				jps.buffDuration("nature's swiftness") < 1, defaultTarget },
 			{ "regrowth",					not oom and jps.buff("clearcasting") and defaultHP < 0.85, defaultTarget },
 			{ "lifebloom",					not oom and jps.buffDuration("lifebloom",defaultTarget) < 1.5 or jps.buffStacks("lifebloom",defaultTarget) < 3 and defaultHP < 0.85, defaultTarget },
 
 		}
 	elseif(playerMana > chart_top_mana_threshold) then
-
-		if(IsAltKeyDown() ~= nil ) then
-    		--print( string.format("jps.buffStacks(lifebloom,lifebloom_Tank) < 3 and canHeal(lifebloom_Tank): %s < 3 and %s", tostring(jps.buffStacks("lifebloom",lifebloom_Tank) < 3), tostring(canHeal(lifebloom_Tank))) )
-    		--print( string.format("lifebloom_Tank: %s", lifebloom_Tank) )
-  		end
-
 		spellTable =
 		{
 		
@@ -308,21 +303,17 @@ function druid_resto(self)
 			{ "nature's cure",				cleanseTarget~=nil, cleanseTarget }, --untested
 
 				--default heals
+			--nature's swiftness use if buff is going to expire
+			{ "healing touch", 				jps.buffDuration("nature's swiftness") < 1, defaultTarget },
 			{ "regrowth",					not jps.Moving and defaultHP < 0.75 or (jps.buff("clearcasting") and defaultHP < 0.85), defaultTarget },
 			{ "swiftmend",					defaultHP < 0.90 and (jps.buff("rejuvenation",defaultTarget) or jps.buff("regrowth",defaultTarget)), defaultTarget },
 			{ "rejuvenation",				defaultHP < 0.90 and (not jps.buff("rejuvenation",defaultTarget) or jps.buffDuration("rejuvenation",defaultTarget) < 1), defaultTarget },
-			
-			--add nature's swiftness use if buff is going to expire
 
 		}
 	elseif(playerMana <= chart_top_mana_threshold and playerMana > conservative_healing_mana_threshold) then --untested
 		--normal raid heal mode
 	
-		--[[ stop casting if conflicting heals ->>>todo
-		if(true) then
-		SpellStopCasting()
-		end
-		]]
+		
 
 		spellTable =
 		{
@@ -427,12 +418,13 @@ function druid_resto(self)
 			{ "nature's cure",				cleanseTarget~=nil, cleanseTarget }, --untested
 
 				--default heals
+			--nature's swiftness use if buff is going to expire
+			{ "healing touch", 				jps.buffDuration("nature's swiftness") < 1, defaultTarget },
 			{ "regrowth",					not jps.Moving and defaultHP < 0.35 or (jps.buff("clearcasting") and defaultHP < 0.75), defaultTarget },
 			{ "swiftmend",					defaultHP < 0.60 and (jps.buff("rejuvenation",defaultTarget) or jps.buff("regrowth",defaultTarget)), defaultTarget },
 			{ "rejuvenation",				defaultHP < 0.60 and (not jps.buff("rejuvenation",defaultTarget) or jps.buffDuration("rejuvenation",defaultTarget) < 1), defaultTarget },
 			
-			--add nature's swiftness use if buff is going to expire
-
+			
 			
 		}
 	elseif(playerMana <= conservative_healing_mana_threshold) then --untested
@@ -523,8 +515,8 @@ function druid_resto(self)
 
 				--default heals
 			
-			--add nature's swiftness use if buff is going to expire
-
+			--nature's swiftness use if buff is going to expire
+			{ "healing touch", 				jps.buffDuration("nature's swiftness") < 1, defaultTarget },
 			
 		}
 	end
@@ -535,6 +527,8 @@ function druid_resto(self)
 			{ "Incarnation: Tree of Life", 	true },
 			
 			{ "lifebloom", 					jps.buff("incarnation: tree of life"), defaultTarget }, 
+			-- test stopcasting check { "regrowth", 					true, defaultTarget }, 
+			
 		}
 	end
 	
@@ -542,6 +536,22 @@ function druid_resto(self)
 
 
 	local spell,target = parseSpellTable(spellTable)
+	--untested manual casts
+	if (spell == "rebirth") then
+		CastSpellByName("rebirth",target)
+	elseif (spell == "Incarnation: Tree of Life") then
+		CastSpellByName("Incarnation: Tree of Life")
+	elseif (spell == "nature's cure") then
+		CastSpellByName("Nature's Cure",target)
+	elseif (spell == "tranquility") then
+		jps.createTimer("tranq",1)
+	end
+	
+	--tranquility protection
+  	if (jps.LastCast == "tranquility" and jps.checkTimer("tranq")~=nil) then
+    	spell = "tranquility"
+  	end
+	
 	jps.Target = target
 	-- Debug
   	if (IsAltKeyDown() ~= nil and spell) then
