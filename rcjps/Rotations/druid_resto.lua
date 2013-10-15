@@ -102,10 +102,11 @@ function druid_resto(self)
 	end
 	
 	-- stop casting if conflicting heals ->>>todo
+	--[[
 	if(jps.hpInc("target")==1 and jps.LastCast ~= "tranquility" and not jps.buff("clearcasting")) then
 		SpellStopCasting()
 	end
-	
+	--]]
 
 	
 	
@@ -190,7 +191,7 @@ function druid_resto(self)
 
 				--default heals
 			--nature's swiftness use if buff is going to expire
-			{ "healing touch", 				jps.buffDuration("nature's swiftness") < 1, defaultTarget },
+			{ "healing touch", 				jps.buffDuration("nature's swiftness") < 1 and jps.buff("nature's swiftness"), defaultTarget },
 			{ "regrowth",					not oom and jps.buff("clearcasting") and defaultHP < 0.85, defaultTarget },
 			{ "lifebloom",					not oom and jps.buffDuration("lifebloom",defaultTarget) < 1.5 or jps.buffStacks("lifebloom",defaultTarget) < 3 and defaultHP < 0.85, defaultTarget },
 
@@ -304,7 +305,7 @@ function druid_resto(self)
 
 				--default heals
 			--nature's swiftness use if buff is going to expire
-			{ "healing touch", 				jps.buffDuration("nature's swiftness") < 1, defaultTarget },
+			{ "healing touch", 				jps.buffDuration("nature's swiftness") < 1 and jps.buff("nature's swiftness"), defaultTarget },
 			{ "regrowth",					not jps.Moving and defaultHP < 0.75 or (jps.buff("clearcasting") and defaultHP < 0.85), defaultTarget },
 			{ "swiftmend",					defaultHP < 0.90 and (jps.buff("rejuvenation",defaultTarget) or jps.buff("regrowth",defaultTarget)), defaultTarget },
 			{ "rejuvenation",				defaultHP < 0.90 and (not jps.buff("rejuvenation",defaultTarget) or jps.buffDuration("rejuvenation",defaultTarget) < 1), defaultTarget },
@@ -419,7 +420,7 @@ function druid_resto(self)
 
 				--default heals
 			--nature's swiftness use if buff is going to expire
-			{ "healing touch", 				jps.buffDuration("nature's swiftness") < 1, defaultTarget },
+			{ "healing touch", 				jps.buffDuration("nature's swiftness") < 1 and jps.buff("nature's swiftness"), defaultTarget },
 			{ "regrowth",					not jps.Moving and defaultHP < 0.35 or (jps.buff("clearcasting") and defaultHP < 0.75), defaultTarget },
 			{ "swiftmend",					defaultHP < 0.60 and (jps.buff("rejuvenation",defaultTarget) or jps.buff("regrowth",defaultTarget)), defaultTarget },
 			{ "rejuvenation",				defaultHP < 0.60 and (not jps.buff("rejuvenation",defaultTarget) or jps.buffDuration("rejuvenation",defaultTarget) < 1), defaultTarget },
@@ -516,7 +517,7 @@ function druid_resto(self)
 				--default heals
 			
 			--nature's swiftness use if buff is going to expire
-			{ "healing touch", 				jps.buffDuration("nature's swiftness") < 1, defaultTarget },
+			{ "healing touch", 				jps.buffDuration("nature's swiftness") < 1 and jps.buff("nature's swiftness"), defaultTarget },
 			
 		}
 	end
@@ -524,10 +525,10 @@ function druid_resto(self)
 	if(testMode) then --untested
 		spellTable =
 		{
-			{ "Incarnation: Tree of Life", 	true },
+			--{ "Incarnation: Tree of Life", 	true },
 			
-			{ "lifebloom", 					jps.buff("incarnation: tree of life"), defaultTarget }, 
-			-- test stopcasting check { "regrowth", 					true, defaultTarget }, 
+			--{ "lifebloom", 					jps.buff("incarnation: tree of life"), defaultTarget }, 
+			{ "regrowth", 					true, defaultTarget }, 
 			
 		}
 	end
@@ -540,7 +541,7 @@ function druid_resto(self)
 	if (spell == "rebirth") then
 		CastSpellByName("rebirth",target)
 	elseif (spell == "Incarnation: Tree of Life") then
-		CastSpellByName("Incarnation: Tree of Life")
+		CastSpell("33891")
 	elseif (spell == "nature's cure") then
 		CastSpellByName("Nature's Cure",target)
 	elseif (spell == "tranquility") then
@@ -548,7 +549,7 @@ function druid_resto(self)
 	end
 	
 	--tranquility protection
-  	if (jps.LastCast == "tranquility" and jps.checkTimer("tranq")~=nil) then
+  	if (jps.checkTimer("tranq")~=nil and jps.checkTimer("tranq")>0) then
     	spell = "tranquility"
   	end
 	
